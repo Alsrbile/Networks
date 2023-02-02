@@ -7,9 +7,8 @@ class SLP(nn.Module):
         self.act = nn.ReLU()
     
     def forward(self, x):
-        
         x = x.reshape(x.shape[0], -1)
         x = self.fc(x)
-        
+        x = self.act(x)
         return x
     
