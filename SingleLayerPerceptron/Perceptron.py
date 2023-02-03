@@ -18,10 +18,11 @@ parser = argparse.ArgumentParser(prog="SLP args")
 parser.add_argument("--batch_size", type=int,   default=64)
 parser.add_argument("--base_lr",    type=float, default=0.001)
 parser.add_argument("--epochs",     type=int,   default=20)
+
 parser.add_argument("--device",     type=str,   default="cuda:0")
-parser.add_argument("--data_root",  type=str, default="data")
+parser.add_argument("--data_root",  type=str,   default="data")
+parser.add_argument("--lof_dir",    type=str,   default="log")
 parser.add_argument("--checkpoint_dir", type=str, default="checkpoint")
-parser.add_argument("--lof_dir",    type=str, default="log")
 args = parser.parse_args()
 
 
