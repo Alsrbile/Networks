@@ -1,6 +1,7 @@
 # Networks
 
-Pipeline 형식에 맞춰 네트워크 제작해보기
+Pipeline 형식에 맞춰 네트워크 제작해보기 (PyTorch)
+
 
 ### Machine learning System Development Flow
     
