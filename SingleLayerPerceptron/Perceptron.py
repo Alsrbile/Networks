@@ -91,15 +91,6 @@ def evaluate(loader, model, loss_fn, metric_fn, device):
     return summary
 
 
-"""Machine learning System Development Flow
-    
-1. Build 'Data processing pipeline'
-2. Build 'Model'
-3. Build 'Training and Evaluation loop'
-    (loss/metric, otpimizer/schedule)
-4. Build 'Save and load subroutine'
-"""
-
 def main():
     print("<SingleLayerPerceptron_Fashion-MNIST>")
     os.makedirs(args.checkpoint_dir, exist_ok=True) # make checkpoint folder 
