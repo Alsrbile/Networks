@@ -5,6 +5,7 @@ import argparse
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+import torchvision.transforms as T
 
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
@@ -14,14 +15,14 @@ from torchmetrics.functional.classification import accuracy
 from src.model import SLP
 
 # Parameter
-parser = argparse.ArgumentParser(prog="SLP args")
+parser = argparse.ArgumentParser()
 parser.add_argument("--batch_size", type=int,   default=64)
 parser.add_argument("--base_lr",    type=float, default=0.001)
-parser.add_argument("--epochs",     type=int,   default=20)
+parser.add_argument("--epochs",     type=int,   default=200)
 
 parser.add_argument("--device",     type=str,   default="cuda:0")
 parser.add_argument("--data_root",  type=str,   default="data")
-parser.add_argument("--lof_dir",    type=str,   default="log")
+parser.add_argument("--log_dir",    type=str,   default="log")
 parser.add_argument("--checkpoint_dir", type=str, default="checkpoint")
 args = parser.parse_args()
 
@@ -92,25 +93,31 @@ def evaluate(loader, model, loss_fn, metric_fn, device):
 
 
 def main():
-    print("<SingleLayerPerceptron_Fashion-MNIST>")
+    name = "SLP_Fashion-MNIST" 
+    print(name)
     os.makedirs(args.checkpoint_dir, exist_ok=True) # make checkpoint folder 
-    checkpoint_path = f"{args.checkpoint_dir}/{sys.argv[0]}_last.pth"
+    checkpoint_path = f"{args.checkpoint_dir}/{name}_last.pth"
     
     # 1. Data processing pipeline (Fashion-MNIST)
     # https://pytorch.org/vision/stable/generated/torchvision.datasets.FashionMNIST.html
+    
+    transform = T.Compose([
+        T.ToTensor(),                   # PIL image -> Tensor
+        T.Normalize((0.5,), (0.5,)),    # Normalize (mean & std)
+    ])
     
     train_data = torchvision.datasets.FashionMNIST(
         root = args.data_root,
         train = True,
         download = True,
-        # transform = 
+        transform = transform,
     )
     
     test_data = torchvision.datasets.FashionMNIST(
         root = args.data_root,
         train = False,
         download = True,
-        # transform =
+        transform = transform,
     )
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True)
@@ -124,18 +131,18 @@ def main():
     
     # 2. Model
     model = SLP(dim=input_dim)        
-    model.to(device=args.deivce)
-    
+    model = model.to(args.device)
+    print(model)
     
     # 3. Training and Evaluation loop (optimizer, scheduler, loss function, metric function)
     optimizer   = optim.Adam(model.parameters(), lr=args.base_lr)
     scheduler   = optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs*len(train_loader))
     loss_fn     = nn.CrossEntropyLoss()
-    metric_fn   = accuracy()
+    metric_fn   = accuracy
     
     # Build logger
     train_logger    = SummaryWriter(f"{args.log_dir}/train")
-    test_logger     = SummaryWriter(f"{args.los_dir}/test")
+    test_logger     = SummaryWriter(f"{args.log_dir}/test")
     
     # Checking previous checkpoint
     if os.path.isfile(f"{checkpoint_path}"):
@@ -153,7 +160,8 @@ def main():
         test_summary    = evaluate(test_loader, model, 
                                 loss_fn, metric_fn, args.device)
 
-        # Write log
+        # Write log 
+        # $ tensorboard --logdir=log
         train_logger.add_scalar("Loss", train_summary["loss"], epoch+1)
         train_logger.add_scalar("Acc", train_summary["metric"], epoch+1)
         test_logger.add_scalar("Loss", test_summary['loss'], epoch+1)
@@ -163,7 +171,7 @@ def main():
               + f"Train loss {train_summary['loss']:.04f}, "
               + f"Train acc {train_summary['metric']:.04f}, "
               + f"Test loss {test_summary['loss']:.04f}, "
-              + f"Test acc {test_summary['metric']:.04f}, ")
+              + f"Test acc {test_summary['metric']:.04f}")
         
         # 4. Save and load subroutine
         state_dict = {  
