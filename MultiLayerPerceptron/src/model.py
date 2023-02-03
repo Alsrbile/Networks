@@ -12,7 +12,7 @@ class MLP(nn.Module):
         x = x.reshape(x.shape[0], -1)
         x = self.act(self.fc1(x))
         x = self.act(self.fc2(x))
-        x = self.act(self.fc3(x))
-        
+        x = self.fc3(x)
+                
         return x
     
