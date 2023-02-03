@@ -18,7 +18,7 @@ from src.model import SLP
 parser = argparse.ArgumentParser()
 parser.add_argument("--batch_size", type=int,   default=64)
 parser.add_argument("--base_lr",    type=float, default=0.001)
-parser.add_argument("--epochs",     type=int,   default=200)
+parser.add_argument("--epochs",     type=int,   default=50)
 
 parser.add_argument("--device",     type=str,   default="cuda:0")
 parser.add_argument("--data_root",  type=str,   default="data")
