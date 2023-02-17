@@ -1,23 +1,26 @@
-import torch
 import os
+import torch
 import argparse
-from torchvision.datasets import FashionMNIST
-import torchvision.transforms as T
-from torch.utils.data import DataLoader 
-from src.model import CNN
+
 import torch.nn as nn
 import torch.optim as optim
-from torchmetrics.functional.classification import accuracy
-from torchmetrics.aggregation import MeanMetric
+import torchvision.transforms as T
+
+from src.model import CNN
+
 from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import DataLoader 
+from torchvision.datasets import FashionMNIST
+from torchmetrics.aggregation import MeanMetric
+from torchmetrics.functional.classification import accuracy
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--device",         type=str,   default="cuda:0")
-parser.add_argument("--batch_size",     type=int,   default=64)
 parser.add_argument("--lr",             type=float, default=0.001)
+parser.add_argument("--batch_size",     type=int,   default=64)
 parser.add_argument("--epochs",         type=int,   default=50)
 parser.add_argument("--log_dir",        type=str,   default="log")
+parser.add_argument("--device",         type=str,   default="cuda:0")
 parser.add_argument("--checkpoint_dir",     type=str, default="checkpoint")
 args = parser.parse_args()
 
@@ -49,29 +52,23 @@ def train(loader, model, optimizer, scheduler, loss_fn, metric_fn, device):
     return summary
 
 def evaluate(loader, model, loss_fn, metric_fn, device):
-    # model -> evaluation mode
     model.eval()
     
-    # Create average meters to measure loss and accuracy
     loss_mean   = MeanMetric().to(device)
     metric_mean = MeanMetric().to(device)
     
-    # Evaluate mode for one epoch
     for inputs, targets, in loader:
         inputs  = inputs.to(device)
         targets = targets.to(device)
         
-        # Forward
         with torch.no_grad():
             outputs = model(inputs)
         loss    = loss_fn(outputs, targets)
         metric  = metric_fn(outputs, targets)
         
-        # Update statistics
         loss_mean.update(loss)
         metric_mean.update(metric)
     
-    # Summarize statistics
     summary = {"loss": loss_mean.compute(), "metric": metric_mean.compute()}
     
     return summary
