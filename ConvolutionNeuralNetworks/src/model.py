@@ -1,13 +1,5 @@
 import torch.nn as nn
 
-def conv_block(inputs, in_channels=1, out_channels=32, kernel_size=3, stride=1, padding=1):
-    x = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)(inputs)
-    x = nn.BatchNorm2d(out_channels)(x)
-    x = nn.ReLU()(x)
-    x = nn.Dropout()(x) 
-    
-    return x
-
 class CNN_block(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
         super(CNN_block, self).__init__()
@@ -25,7 +17,6 @@ class CNN_block(nn.Module):
         return x
         
         
-    
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
@@ -55,7 +46,7 @@ class CNN(nn.Module):
         
     
     def forward(self, x):
-        # 64, 1, 28, 28
+
         x = self.conv_block_11(x)
         x = self.conv_block_12(x)
         x = self.conv_block_13(x)
@@ -67,19 +58,15 @@ class CNN(nn.Module):
         x = self.conv_block_31(x)
         x = self.conv_block_32(x)
         x = self.conv_block_33(x)
-        # print(x.shape)
-        # 64, 128, 4, 4
+        
         x = self.conv4(x)
-        # print(x.shape)
         x = self.bn4(x)
         x = self.relu(x)
         x = self.avgpool(x)
         x = self.dropout(x) 
-        # 64, 32, 26, 26
-        # print(x.shape)
         
         x = x.reshape(-1,512)
         x = self.fc(x)
         x = self.sm(x)
-        # print(x.shape)
+
         return x
