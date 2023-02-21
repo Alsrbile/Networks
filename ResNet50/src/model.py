@@ -10,10 +10,25 @@ def get_resnet(name):
     
     return model[name]
 
+class CNN_block(nn.Module):
+    def __init__(self):
+        super(self, ResNet18).__init__()
+
+        self.conv = nn.Conv2d(in_channels=784)
+        
+    def forward(self, x):
+        
+        return x
+
 class ResNet18(nn.Module):
     def __init__(self):
         super(self, ResNet18).__init__()
         
+        #self.conv1 = nn.Conv2d(in_channels=784, out_channels=)
+        
+    def forward(self, x):
+        
+        return x
 
 class ResNet50(nn.Module):
     def __init__(self):
